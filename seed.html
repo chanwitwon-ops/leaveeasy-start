@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ใส่ข้อมูลตัวอย่าง · LeaveEasy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/util.js" defer></script>
+  <script src="js/nav.js" defer></script>
+  <script src="js/data.js" defer></script>
+  <script src="js/firebase-config.js"></script>
+  <script type="module" src="js/firebase.js"></script>
+  <script src="js/seed.js" defer></script>
+</head>
+<body>
+  <div id="nav"></div>
+
+  <div class="container">
+    <h1>ใส่ข้อมูลตัวอย่างลง Firestore</h1>
+    <p class="subtitle">กดปุ่มครั้งเดียวเพื่อใส่ users · leaveTypes · leaveRequests · approvals ตามข้อมูลตัวอย่างของ spec</p>
+
+    <div class="card" style="margin-top:16px">
+      <button id="ปุ่มซีด" class="btn">ใส่ข้อมูลตัวอย่างลง Firestore</button>
+      <p id="สถานะซีด" style="margin-top:12px">ยังไม่ได้กด</p>
+    </div>
+  </div>
+</body>
+</html>
