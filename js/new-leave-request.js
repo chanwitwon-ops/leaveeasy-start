@@ -1,21 +1,41 @@
 // ─────────────────────────────────────────────────────────────
 // js/new-leave-request.js — หน้าที่ 2 ยื่นใบลาใหม่
-// สัปดาห์ที่ 6 (ต้นสัปดาห์): เก็บไว้ในหน่วยความจำของเบราว์เซอร์เท่านั้น
-// ยังไม่บันทึกลงฐานข้อมูล (เป็นงานของสัปดาห์ที่ 7)
+// สัปดาห์ที่ 7: บันทึกลง Firestore จริง (โฟลเดอร์ leaveRequests)
 // ─────────────────────────────────────────────────────────────
 
 (function () {
   var ฟอร์ม = document.getElementById("ฟอร์มใบลา");
   var ช่องประเภท = document.getElementById("leaveTypeId");
   var กล่องเตือน = document.getElementById("ข้อความเตือน");
+  var ปุ่มบันทึก = ฟอร์ม.querySelector('button[type="submit"]');
 
-  // เติมรายการเลื่อนลงด้วยประเภทการลาที่มีอยู่
-  window.LEAVE_DATA.leaveTypes.forEach(function (ประเภท) {
-    var ตัวเลือก = document.createElement("option");
-    ตัวเลือก.value = ประเภท.id;
-    ตัวเลือก.textContent = ประเภท.name;
-    ช่องประเภท.appendChild(ตัวเลือก);
-  });
+  ถ้าพร้อมแล้วให้โหลด();
+
+  // js/firebase.js เป็น module โหลดแยกจากไฟล์นี้ ต้องรอให้มันเชื่อมต่อเสร็จก่อน
+  function ถ้าพร้อมแล้วให้โหลด() {
+    if (window.db) {
+      โหลดประเภทการลา();
+    } else {
+      window.addEventListener("firebase-ready", โหลดประเภทการลา, { once: true });
+    }
+  }
+
+  // เติมรายการเลื่อนลงด้วยประเภทการลาที่มีอยู่จริงใน Firestore
+  async function โหลดประเภทการลา() {
+    try {
+      var สแนปช็อต = await window.fsGetDocs(window.fsCollection(window.db, "leaveTypes"));
+      สแนปช็อต.forEach(function (เอกสาร) {
+        var ข้อมูล = เอกสาร.data();
+        var ตัวเลือก = document.createElement("option");
+        ตัวเลือก.value = เอกสาร.id;
+        ตัวเลือก.textContent = ข้อมูล.name;
+        ช่องประเภท.appendChild(ตัวเลือก);
+      });
+    } catch (err) {
+      เตือน("โหลดประเภทการลาไม่สำเร็จ: " + err.message);
+      console.error(err);
+    }
+  }
 
   ฟอร์ม.addEventListener("submit", function (e) {
     e.preventDefault();
@@ -24,6 +44,7 @@
       title: document.getElementById("title").value.trim(),
       reason: document.getElementById("reason").value.trim(),
       leaveTypeId: ช่องประเภท.value,
+      leaveTypeName: ช่องประเภท.options[ช่องประเภท.selectedIndex] ? ช่องประเภท.options[ช่องประเภท.selectedIndex].textContent : "",
       startDate: document.getElementById("startDate").value,
       endDate: document.getElementById("endDate").value
     };
@@ -38,28 +59,36 @@
       return;
     }
 
-    var ประเภท = window.LEAVE_DATA.leaveTypes.find(function (t) { return t.id === ค่า.leaveTypeId; });
-
-    // สัปดาห์ที่ 6 ยังไม่มีล็อกอิน จึงสมมติว่าผู้ขอลาคือ สมชาย ใจดี
-    var ใบใหม่ = {
-      id: "lr-ใหม่-" + Date.now(),
-      title: ค่า.title,
-      reason: ค่า.reason,
-      status: "รอพิจารณา",                       // ใบใหม่เริ่มที่ รอพิจารณา เสมอ
-      requesterId: "u001", requesterName: "สมชาย ใจดี",
-      approverId: "",      approverName: "",
-      leaveTypeId: ประเภท.id, leaveTypeName: ประเภท.name,
-      startDate: ค่า.startDate,
-      endDate: ค่า.endDate,
-      createdAt: เวลาตอนนี้()
-    };
-
-    var รายการ = JSON.parse(sessionStorage.getItem("ใบลาที่ยื่นใหม่") || "[]");
-    รายการ.push(ใบใหม่);
-    sessionStorage.setItem("ใบลาที่ยื่นใหม่", JSON.stringify(รายการ));
-
-    location.href = "leave-requests.html";
+    บันทึกใบลา(ค่า);
   });
+
+  async function บันทึกใบลา(ค่า) {
+    ปุ่มบันทึก.disabled = true;
+    try {
+      // สัปดาห์ที่ 7 ยังไม่มีล็อกอิน จึงสมมติว่าผู้ขอลาคือ สมชาย ใจดี
+      // (Section C จะแทนที่ด้วยผู้ใช้ที่ล็อกอินอยู่จริง)
+      var ใบใหม่ = {
+        title: ค่า.title,
+        reason: ค่า.reason,
+        status: "รอพิจารณา",                       // ใบใหม่เริ่มที่ รอพิจารณา เสมอ
+        requesterId: "u001", requesterName: "สมชาย ใจดี",
+        approverId: "",      approverName: "",
+        leaveTypeId: ค่า.leaveTypeId, leaveTypeName: ค่า.leaveTypeName,
+        startDate: ค่า.startDate,
+        endDate: ค่า.endDate,
+        createdAt: เวลาตอนนี้()
+      };
+
+      var เอกสารใหม่ = window.fsDoc(window.fsCollection(window.db, "leaveRequests"));
+      await window.fsSetDoc(เอกสารใหม่, ใบใหม่);
+
+      location.href = "leave-requests.html";
+    } catch (err) {
+      เตือน("บันทึกไม่สำเร็จ: " + err.message);
+      console.error(err);
+      ปุ่มบันทึก.disabled = false;
+    }
+  }
 
   function เตือน(ข้อความ) {
     กล่องเตือน.textContent = "⚠️ " + ข้อความ;

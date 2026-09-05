@@ -8,10 +8,13 @@ import {
   getFirestore,
   collection,
   getDocs,
+  getDoc,
   query,
   orderBy,
   doc,
-  setDoc
+  setDoc,
+  updateDoc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 var app = initializeApp(window.FIREBASE_CONFIG);
@@ -20,10 +23,13 @@ var app = initializeApp(window.FIREBASE_CONFIG);
 window.db = getFirestore(app);
 window.fsCollection = collection;
 window.fsGetDocs = getDocs;
+window.fsGetDoc = getDoc;
 window.fsQuery = query;
 window.fsOrderBy = orderBy;
 window.fsDoc = doc;
 window.fsSetDoc = setDoc;
+window.fsUpdateDoc = updateDoc;
+window.fsDeleteDoc = deleteDoc;
 
 // บอกไฟล์อื่นว่าเชื่อมต่อพร้อมแล้ว (module script โหลดหลัง script ธรรมดาเสมอ
 // จึงต้องมีสัญญาณนี้ให้ไฟล์อื่นรอ แทนการเดาว่าพร้อมหรือยัง)
