@@ -16,6 +16,13 @@ import {
   updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
 
 var app = initializeApp(window.FIREBASE_CONFIG);
 
@@ -30,6 +37,12 @@ window.fsDoc = doc;
 window.fsSetDoc = setDoc;
 window.fsUpdateDoc = updateDoc;
 window.fsDeleteDoc = deleteDoc;
+
+window.auth = getAuth(app);
+window.fbOnAuthStateChanged = onAuthStateChanged;
+window.fbSignIn = signInWithEmailAndPassword;
+window.fbCreateUser = createUserWithEmailAndPassword;
+window.fbSignOut = signOut;
 
 // บอกไฟล์อื่นว่าเชื่อมต่อพร้อมแล้ว (module script โหลดหลัง script ธรรมดาเสมอ
 // จึงต้องมีสัญญาณนี้ให้ไฟล์อื่นรอ แทนการเดาว่าพร้อมหรือยัง)

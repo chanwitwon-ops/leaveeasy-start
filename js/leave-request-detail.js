@@ -13,12 +13,13 @@
 
   ถ้าพร้อมแล้วให้โหลด();
 
-  // js/firebase.js เป็น module โหลดแยกจากไฟล์นี้ ต้องรอให้มันเชื่อมต่อเสร็จก่อน
+  // auth-guard.js ยิง auth-ready หลังรู้ว่าใครล็อกอินอยู่ (หลัง firebase-ready เสมอ)
+  // ต้องรอให้รู้ role ก่อน ถึงจะวาดปุ่มอนุมัติ/ไม่อนุมัติได้ถูกต้อง
   function ถ้าพร้อมแล้วให้โหลด() {
-    if (window.db) {
+    if (window.CURRENT_USER) {
       โหลดข้อมูล();
     } else {
-      window.addEventListener("firebase-ready", โหลดข้อมูล, { once: true });
+      window.addEventListener("auth-ready", โหลดข้อมูล, { once: true });
     }
   }
 
@@ -72,14 +73,28 @@
       return '<div class="field-row"><span class="k">' + r[0] + "</span><span>" + r[1] + "</span></div>";
     }).join("");
 
+    var เป็นเจ้าของใบ = window.CURRENT_USER.uid === ใบ.requesterId;
+
+    // ปุ่มอนุมัติ/ไม่อนุมัติ ให้เฉพาะ role ผู้อนุมัติ (manager) กับฝ่ายบุคคล (hr) — ตาม spec หัวข้อ 2
+    // ยกเว้นใบของตัวเอง ห้ามอนุมัติเอง (self-approval) แม้จะเป็น manager/hr ก็ตาม
+    var เป็นผู้มีสิทธิ์อนุมัติ =
+      (window.CURRENT_USER.role === "manager" || window.CURRENT_USER.role === "hr") && !เป็นเจ้าของใบ;
+
+    // ปุ่มลบ: เจ้าของใบลบใบตัวเองได้ (US-07) · hr ลบได้ทุกใบ (สเปกไม่ห้าม hr ไว้) · manager ลบใบคนอื่นไม่ได้
+    var เป็นผู้มีสิทธิ์ลบ = เป็นเจ้าของใบ || window.CURRENT_USER.role === "hr";
+
     // ปุ่มอนุมัติ / ไม่อนุมัติ / ลบ ขึ้นเฉพาะใบที่ยังรอพิจารณา
     if (ใบ.status === "รอพิจารณา") {
-      html +=
-        '<div class="btn-row">' +
-        '<button type="button" class="btn-ok" id="ปุ่มอนุมัติ">อนุมัติ</button>' +
-        '<button type="button" class="btn-danger" id="ปุ่มไม่อนุมัติ">ไม่อนุมัติ</button>' +
-        '<button type="button" class="btn-danger" id="ปุ่มลบ">ลบใบลานี้</button>' +
-        "</div>";
+      html += '<div class="btn-row">';
+      if (เป็นผู้มีสิทธิ์อนุมัติ) {
+        html +=
+          '<button type="button" class="btn-ok" id="ปุ่มอนุมัติ">อนุมัติ</button>' +
+          '<button type="button" class="btn-danger" id="ปุ่มไม่อนุมัติ">ไม่อนุมัติ</button>';
+      }
+      if (เป็นผู้มีสิทธิ์ลบ) {
+        html += '<button type="button" class="btn-danger" id="ปุ่มลบ">ลบใบลานี้</button>';
+      }
+      html += "</div>";
     } else {
       html += '<p class="hint">ใบนี้พิจารณาแล้ว จึงเปลี่ยนสถานะต่อไม่ได้</p>';
     }
@@ -87,9 +102,13 @@
     กล่องใบลา.innerHTML = html;
 
     if (ใบ.status === "รอพิจารณา") {
-      document.getElementById("ปุ่มอนุมัติ").addEventListener("click", function () { เปลี่ยนสถานะ("อนุมัติ"); });
-      document.getElementById("ปุ่มไม่อนุมัติ").addEventListener("click", function () { เปลี่ยนสถานะ("ไม่อนุมัติ"); });
-      document.getElementById("ปุ่มลบ").addEventListener("click", ลบใบลา);
+      if (เป็นผู้มีสิทธิ์อนุมัติ) {
+        document.getElementById("ปุ่มอนุมัติ").addEventListener("click", function () { เปลี่ยนสถานะ("อนุมัติ"); });
+        document.getElementById("ปุ่มไม่อนุมัติ").addEventListener("click", function () { เปลี่ยนสถานะ("ไม่อนุมัติ"); });
+      }
+      if (เป็นผู้มีสิทธิ์ลบ) {
+        document.getElementById("ปุ่มลบ").addEventListener("click", ลบใบลา);
+      }
     }
   }
 
@@ -152,10 +171,8 @@
     เตือน.classList.add("hidden");
 
     try {
-      // สัปดาห์ที่ 7 ยังไม่มีล็อกอิน จึงสมมติว่าผู้เขียนคือ สมหญิง รักงาน
-      // (Section C จะแทนที่ด้วยผู้ใช้ที่ล็อกอินอยู่จริง)
       var ความเห็นใหม่ = {
-        authorId: "u002", authorName: "สมหญิง รักงาน",
+        authorId: window.CURRENT_USER.uid, authorName: window.CURRENT_USER.name,
         message: ข้อความ,
         createdAt: เวลาตอนนี้()
       };

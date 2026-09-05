@@ -62,16 +62,24 @@
     บันทึกใบลา(ค่า);
   });
 
+  // auth-guard.js ยิง auth-ready หลังรู้ว่าใครล็อกอินอยู่ — รอให้พร้อมก่อนถึงจะรู้ requesterId ที่แท้จริง
+  async function ถ้าผู้ใช้พร้อมแล้ว() {
+    if (window.CURRENT_USER) return;
+    await new Promise(function (resolve) {
+      window.addEventListener("auth-ready", resolve, { once: true });
+    });
+  }
+
   async function บันทึกใบลา(ค่า) {
     ปุ่มบันทึก.disabled = true;
     try {
-      // สัปดาห์ที่ 7 ยังไม่มีล็อกอิน จึงสมมติว่าผู้ขอลาคือ สมชาย ใจดี
-      // (Section C จะแทนที่ด้วยผู้ใช้ที่ล็อกอินอยู่จริง)
+      await ถ้าผู้ใช้พร้อมแล้ว();
+
       var ใบใหม่ = {
         title: ค่า.title,
         reason: ค่า.reason,
         status: "รอพิจารณา",                       // ใบใหม่เริ่มที่ รอพิจารณา เสมอ
-        requesterId: "u001", requesterName: "สมชาย ใจดี",
+        requesterId: window.CURRENT_USER.uid, requesterName: window.CURRENT_USER.name,
         approverId: "",      approverName: "",
         leaveTypeId: ค่า.leaveTypeId, leaveTypeName: ค่า.leaveTypeName,
         startDate: ค่า.startDate,
