@@ -1,5 +1,7 @@
 # 🔧 LeaveEasy — จุดเริ่มต้นของใบงาน
 
+🌐 **เว็บออนไลน์:** https://leaveeasy-43342.web.app
+
 **ผู้ทำ:** ชาญวิทย์ วงศ์ทิพย์
 
 **ADT-RAISE Non-Degree Batch 2 · Module 2: MVP-Ready** (สัปดาห์ที่ 6–9)
