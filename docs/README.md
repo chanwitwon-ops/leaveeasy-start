@@ -19,7 +19,13 @@
 
 | ไฟล์ | เนื้อหา | Checkpoint |
 |---|---|---|
+| `week7-checkpoint2-1-before-list.png` | หน้ารายการใบลา ก่อนยื่นใบใหม่ (7 ใบ) | ✅ Checkpoint 2 (1/4) |
+| `week7-checkpoint2-2-new-request-form.png` | กรอกฟอร์มยื่นใบลาใหม่ "ลาแล้วแก้วตา" | ✅ Checkpoint 2 (2/4) |
+| `week7-checkpoint2-3-after-save.png` | บันทึกสำเร็จ กลับมาหน้ารายการเห็นใบใหม่ (8 ใบ) | ✅ Checkpoint 2 (3/4) |
+| `week7-checkpoint2-4-after-close-reopen-login.png` | ล็อกเอาท์ → ปิดเบราว์เซอร์ → เปิดใหม่ → ล็อกอินใหม่ → ยังเห็นใบลาที่เพิ่งเพิ่มครบ 8 ใบเหมือนเดิม | ✅ Checkpoint 2 (4/4) |
 | `week7-checkpoint4-url-shared-in-group-chat.jpg` | โพสต์ URL ออนไลน์ `https://leaveeasy-43342.web.app` ในแชทกลุ่มคาบเรียน (Zoom) | ✅ Checkpoint 4 |
 | `week7-checkpoint4-login-from-another-device.jpg` | เปิด URL จากคอมพิวเตอร์อีกเครื่อง คนละเน็ตเวิร์ก ยังไม่ล็อกอิน ขึ้นหน้า "เข้าสู่ระบบ" ทันที ไม่มีข้อมูลใบลาโผล่มา | ✅ Checkpoint 4 |
+| `week7-checkpoint3-1-incognito-redirect-login.png` | เปิดหน้าต่าง Incognito ไม่ได้ล็อกอิน โดนเด้งไปหน้า `login.html` ทันที (auth-guard ฝั่ง client) | ✅ Checkpoint 3 (1/2) |
+| `week7-checkpoint3-2-console-permission-denied.png` | จากหน้าต่าง Incognito เดียวกัน เปิด DevTools Console แล้วสั่งอ่าน `leaveRequests` ตรงผ่าน `window.db` โดยไม่ล็อกอิน ได้ error `permission-denied - Missing or insufficient permissions.` พิสูจน์ว่า Firestore Security Rules บล็อกจริง ไม่ใช่แค่หน้าเว็บกันไว้ | ✅ Checkpoint 3 (2/2) |
 
-⚠️ ยังขาดหลักฐาน **Checkpoint 2** (screenshot ก่อน-หลังปิดเบราว์เซอร์ พิสูจน์ข้อมูลไม่หาย) และ **Checkpoint 3** (screenshot หน้าต่าง private ที่ขึ้น `permission-denied`) — ถ่ายเพิ่มแล้วเอาไฟล์มาให้ Claude ใส่ต่อได้เลย
+ครบทั้ง Checkpoint 2, 3, 4 ของใบงานที่ 2 แล้ว
