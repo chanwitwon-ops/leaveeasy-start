@@ -24,6 +24,20 @@ desktop.ini
 static-server.ps1
 
 
+# ── ไฟล์ที่มีคีย์ / ค่าตั้งค่าลับ (เพิ่มสัปดาห์ที่ 7) ──
+# ค่าตั้งค่า Firebase จริงของโปรเจกต์ — ใช้ js/firebase-config.example.js เป็นต้นแบบแทน
+js/firebase-config.js
+.env
+.env.*
+*serviceAccountKey*.json
+
+# ── ไฟล์ชั่วคราวของ Firebase CLI (เพิ่มสัปดาห์ที่ 7) ──
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+
 # ─────────────────────────────────────────────────────────────
 # ✅ วิธีตรวจว่าใช้ได้จริง — ก่อน push ทุกครั้ง พิมพ์บอก Claude ว่า
 #
